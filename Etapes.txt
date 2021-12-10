@@ -214,3 +214,113 @@ FLAG 05:
 
 FLAG 06
 
+    Ici on se retrouve avec un fichier php et un binaire.
+    En executant le binaire on comprend qu'il execute le fichier php.
+
+    On trouve cependant rien de tres interessant dans celui ci.
+
+    Je decide de copier le contenue du fichier php et le coller dans un fichier en dehors de la vm afin de le tester.
+
+    Et la on decouvre quelque chose d'interessant :
+
+    Warning: preg_replace(): The /e modifier is no longer supported, use preg_replace_callback instead 
+    in /Users/jamerlin/Projects/snowCrash/level06.php on line 12
+
+    Apparement le /e de la regex n'est plus supportée sur la nouvelle version de php.
+
+    On vas aller regarder pourquoi.
+
+    https://stackoverflow.com/questions/16986331/can-someone-explain-the-e-regex-modifier
+
+    Ici on nous explique que le /e permettais d'executer du code php dans une expression reguliere en executant la fonction eval().
+
+    Et cela constituais une vulnerabilite. On vas donc regarder un exemple d'exploitation pour comprendre comment cela fonctionne.
+
+    http://www.madirish.net/402
+
+    https://stackoverflow.com/questions/22715752/is-this-preg-replace-example-exploitable-in-any-way
+
+    Apres pas mal de recherche et d'essaye on arrive enfin a creer le fichier attendu :
+
+    echo '[x {${shell_exec('getflag')}}]' > /tmp/regex.php
+
+    on execute ensuite ./level06 /tmp/regex.php et BIM !! 
+
+    PHP Notice:  Use of undefined constant getflag - assumed 'getflag' in /home/user/level06/level06.php(4) : regexp code on line 1
+    PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
+        in /home/user/level06/level06.php(4) : regexp code on line 1
+
+    On recupere le token entre les erreur php.
+
+
+FLAG 07:
+
+    Ici on se retrouve en face d'un binaire qui nous renvoie un de nos id visiblement.
+
+    En regardant de plus pret avec la commande string on peut voir que le fichier fait un appel a system a /bin/echo
+    
+    On peut egalement voir que LOGNAME est utilise.
+
+    Il semblerais donc que le echo se fasse donc sur le LOGNAME et nous savont comment demader a echo d'executer une autre commande avec $(commande).
+
+    On vas donc remplacer la variable d'environement LOGNAME par :
+        LOGNAME='echo $(getflag)'
+    
+    En exectant ensuite le binaire nous avons bien notre flag.
+
+FlAG 08:
+
+    Nous avons encore un executabe mais cette fois avec un fichier 'token' qui semblerait-il contiendrait le saint graal.
+
+    Premiere chose on essaye de lancer l'executabe qui prend en parametre un fichier. On lui envoie token.
+
+    Malheureusement cela nous dit que nous n'avons pas acces au fichier.
+
+    En decortiquand un peu le bianire avec string on se rend compte qu'il y a un appel a strstr qui compare 2 chaines de caracteres.
+
+    et on voit 'token' un peu plus bas juste avant you may not access '%s'
+
+    Il semblerait que pour les fichiers qui contiennent token ce soit directement refuse.
+
+    On vas donc tester de creer un fichier dans tmp qui s'appel token et fichier d'un autre nom et voir si on peut les appeler tout les 2 avec notre binaire.
+
+    Evidement le fichier test dans tmp ne peux pas etre accessible alors que l'autre oui.
+
+    On a malheureusement pas la possiblite de modifier le fichier et donc son nom il vas falloir trouver une autre methode.
+
+    Apres reflexion on comprend que notre problematique est de pouvoir passer le fichier sans preciser token dans le nom.
+
+    Il existe bien une methode... le lien symbolique !
+    
+    ln -s /home/user/level08/token /tmp/lsf
+
+    ./level08 /tmp/lsf
+
+    bim on a le token pour flag08
+
+    quif5eloekouj29ke0vouxean
+
+FLAG 09:
+
+reverse en pyton
+import string
+
+    with open('/home/user/level09/token') as f:
+        contents = f.read()
+        content = filter(lambda x: x in string.printable, contents)
+        txt = content.rstrip("\n") [::-1]
+        print(txt)
+
+add ascii number 
+
+import string
+
+with open('/home/user/level09/token') as f:
+    contents = f.read()
+    content = filter(lambda x: x in string.printable, contents)
+    cpt = 0
+    txt = ""
+    for i, c in content:
+        txt += c + i
+    print(txt)
+

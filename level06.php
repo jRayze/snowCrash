@@ -18,5 +18,3 @@ function x($y, $z)
 $r = x($argv[1], $argv[2]);
 print $r;
 ?>
-
-([x shell_exec(getflag)])
