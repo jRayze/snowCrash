@@ -116,5 +116,8 @@ FLAG 03:
 
     maintenant quand on execute ./level03 ca execute notre écho qui appelle getflag et bim -> Check flag.Here is your token : qi0maab88jeaj46qoumi7maus
 
+FLAG 04:
+
+
 
 
