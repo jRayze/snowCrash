@@ -120,4 +120,210 @@ FLAG 04:
 
 
 
+FLAG 04:
+   Pour le flag04 nous avons un fichier .pl, il s'agit d'un fichier perl.
+   
+   En faisan un cat sur le fichier on peut voir le fichier.
+
+   Le detail :
+	
+	#!/usr/bin/perl                         
+    # localhost:4747                        // adresse du serveur, il faudra remplacer localhost par l'ip de la vm pour y acceder
+    use CGI qw{param};                      //
+    print "Content-type: text/html\n\n";    // affiche le header pour le fichier html
+    sub x {                                 //    fonction x
+        $y = $_[0];                         // y vaux le parametre 0
+        print `echo $y 2>&1`;               // affiche la commande 'echo' avec le parametre 0 et redirige la sortie d'erreur sur la sortie standard
+    }
+    x(param("x"));                          //appel de la fonction x avec le parametre "param" qui prends en paramettre "x"
+
+    en allant sur la page en question [ip vm snowCrash]:4747 on peut voir qu'une page blanche s'affiche
+
+    on essaye d'acceder a la fonction x depuis l'url en ajoutant ?x=test
+
+    ce qui devrait nous retourner test dans la page au vue du code ci dessus,
+
+    c'est bien ce qu'il se passe. On doit maintenant trouver un moyen de recuperer le flag.
+
+    Apres recherche on decouvre que echo est exploitable grace aux commandes de substitutions qui executent la commande dans un sous shell
+    pour se faire on utilise $(nom_de_la_commande).
+
+    On vas donc tenter avec getflag.
+
+    Le echo lisant le parametre indique dans l'url on tape [ip vm snowCrash]:4747?x=$(getflag) et bim on a le flag04
+
+FLAG 05:
+
+    Pour le flag05 on a pas de fichier
+    
+    On refais donc la commade du flag00 
+    
+    find / -user 'flag05'
+
+    on decouvre qu'il n y a que 2 fichier accessibles :
+
+    /usr/sbin/openarenaserver
+
+    allons voir ce que c'est... en faisant un cat sur le fichier on decouvre qu' il s'agit d'un script bash, 
+    
+    il vas falloir le decortiquer pour pouvoir avancer.
+    ____________________________________________
+    |                                           |
+    |   #!/bin/sh                               |
+    |                                           |
+    |   for i in /opt/openarenaserver/* ; do    | pour tout les fichier dans /opt/openarenaserver faire
+    |        (ulimit -t 5; bash -x "$i")        | (limiter a 5s l'utilsation du processeur; execute le fichier)
+    |        rm -f "$i"                         | supprime le fichier
+    |   done                                    |
+    _____________________________________________
+
+    en relancant la machine je m'appercois qu'il y avait un message a la connexion : 'You have new mail'.
+
+    on vois sur internet que les mails sont stockes dans /var/mail donc allons voir
+
+    il y a bien un fichier level05 contenant 
+
+    */2 * * * * su -c "sh /usr/sbin/openarenaserver" - flag05
+
+    en tapant */2 * * * * sur internet on voit qu'il s'agit d'un crontab,
+    
+    le crontab est un tableau pour automatiser des taches toutes les x temps (cronjob)
+     
+    chaques etoiles correspond a une unite temporaires
+
+    la premiere les minutes > ensuite heure > jour > mois > jours de la semaine le slash indique une unite
+
+    donc la ca nous donne 2 minutes. La tache qui suit s'execute donc toute les 2 minutes
+
+    le - flag05 associe au su indique que la commande est execute depuis le repertoire home de l'utilisateur flag05
+
+    donc si nous recapitulons toute la ligne cela nous donne :
+
+    toute les 2 minutes lance depuis le home de flag05 la commande "sh /usr/sbin/openarenaserver"
+
+    donc avec ce qu'on a compris du script il faudrait cree un fichier qui appelle getflag et qui enregistre le resultat 
+
+    dans un fichier donc nous allons utiliser la commande suivante :
+
+    echo "getflag > /tmp/flag" > getflag
+
+    que nous mettrons dans le dossier en question a savoir /opt/openarenaserver
+
+    il ne faut pas oublier de le mettre e executable avec chmod 777
+
+    et nous allons attendre 2 minutes pour etre sure que le script soit bien execute
+
+    ceci fait nous aurons le droit a notre resultat dans /tmp/flag ;)
+
+FLAG 06
+
+    Ici on se retrouve avec un fichier php et un binaire.
+    En executant le binaire on comprend qu'il execute le fichier php.
+
+    On trouve cependant rien de tres interessant dans celui ci.
+
+    Je decide de copier le contenue du fichier php et le coller dans un fichier en dehors de la vm afin de le tester.
+
+    Et la on decouvre quelque chose d'interessant :
+
+    Warning: preg_replace(): The /e modifier is no longer supported, use preg_replace_callback instead 
+    in /Users/jamerlin/Projects/snowCrash/level06.php on line 12
+
+    Apparement le /e de la regex n'est plus supportée sur la nouvelle version de php.
+
+    On vas aller regarder pourquoi.
+
+    https://stackoverflow.com/questions/16986331/can-someone-explain-the-e-regex-modifier
+
+    Ici on nous explique que le /e permettais d'executer du code php dans une expression reguliere en executant la fonction eval().
+
+    Et cela constituais une vulnerabilite. On vas donc regarder un exemple d'exploitation pour comprendre comment cela fonctionne.
+
+    http://www.madirish.net/402
+
+    https://stackoverflow.com/questions/22715752/is-this-preg-replace-example-exploitable-in-any-way
+
+    Apres pas mal de recherche et d'essaye on arrive enfin a creer le fichier attendu :
+
+    echo '[x {${shell_exec('getflag')}}]' > /tmp/regex.php
+
+    on execute ensuite ./level06 /tmp/regex.php et BIM !! 
+
+    PHP Notice:  Use of undefined constant getflag - assumed 'getflag' in /home/user/level06/level06.php(4) : regexp code on line 1
+    PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
+        in /home/user/level06/level06.php(4) : regexp code on line 1
+
+    On recupere le token entre les erreur php.
+
+
+FLAG 07:
+
+    Ici on se retrouve en face d'un binaire qui nous renvoie un de nos id visiblement.
+
+    En regardant de plus pret avec la commande string on peut voir que le fichier fait un appel a system a /bin/echo
+    
+    On peut egalement voir que LOGNAME est utilise.
+
+    Il semblerais donc que le echo se fasse donc sur le LOGNAME et nous savont comment demader a echo d'executer une autre commande avec $(commande).
+
+    On vas donc remplacer la variable d'environement LOGNAME par :
+        LOGNAME='echo $(getflag)'
+    
+    En exectant ensuite le binaire nous avons bien notre flag.
+
+FlAG 08:
+
+    Nous avons encore un executabe mais cette fois avec un fichier 'token' qui semblerait-il contiendrait le saint graal.
+
+    Premiere chose on essaye de lancer l'executabe qui prend en parametre un fichier. On lui envoie token.
+
+    Malheureusement cela nous dit que nous n'avons pas acces au fichier.
+
+    En decortiquand un peu le bianire avec string on se rend compte qu'il y a un appel a strstr qui compare 2 chaines de caracteres.
+
+    et on voit 'token' un peu plus bas juste avant you may not access '%s'
+
+    Il semblerait que pour les fichiers qui contiennent token ce soit directement refuse.
+
+    On vas donc tester de creer un fichier dans tmp qui s'appel token et fichier d'un autre nom et voir si on peut les appeler tout les 2 avec notre binaire.
+
+    Evidement le fichier test dans tmp ne peux pas etre accessible alors que l'autre oui.
+
+    On a malheureusement pas la possiblite de modifier le fichier et donc son nom il vas falloir trouver une autre methode.
+
+    Apres reflexion on comprend que notre problematique est de pouvoir passer le fichier sans preciser token dans le nom.
+
+    Il existe bien une methode... le lien symbolique !
+    
+    ln -s /home/user/level08/token /tmp/lsf
+
+    ./level08 /tmp/lsf
+
+    bim on a le token pour flag08
+
+    quif5eloekouj29ke0vouxean
+
+FLAG 09:
+
+reverse en pyton
+import string
+
+    with open('/home/user/level09/token') as f:
+        contents = f.read()
+        content = filter(lambda x: x in string.printable, contents)
+        txt = content.rstrip("\n") [::-1]
+        print(txt)
+
+add ascii number 
+
+import string
+
+with open('/home/user/level09/token') as f:
+    contents = f.read()
+    content = filter(lambda x: x in string.printable, contents)
+    cpt = 0
+    txt = ""
+    for i, c in content:
+        txt += c + i
+    print(txt)
 
