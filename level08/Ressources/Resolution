@@ -1,0 +1,32 @@
+FlAG 08 :
+
+    Nous avons encore un executabe mais cette fois avec un fichier 'token' qui semblerait-il contiendrait le saint graal.
+
+    Premiere chose on essaye de lancer l'executabe qui prend en paramètre un fichier et on lui envoie token.
+
+    Malheureusement cela nous dit que nous n'avons pas accès au fichier.
+
+    En décortiquant un peu le bianire avec strings on se rend compte qu'il y a un appel a `strstr` qui compare 2 chaines
+    de caractères et on voit 'token' un peu plus bas juste avant `you may not access '%s'`.
+
+    Il semblerait que pour les fichiers qui contiennent token ce soit directement refusé.
+
+    On vas donc tester de créer un fichier dans tmp qui s'appel token et fichier d'un autre nom et voir si on peut les
+    appeler tout les 2 avec notre binaire.
+
+    Evidement le fichier test dans tmp ne peux pas être accessible alors que l'autre oui.
+
+    On a malheureusement pas la possibilité de modifier le fichier et donc son nom il vas falloir trouver une autre
+    methode.
+
+    Apres reflexion on comprend que notre problématique est de pouvoir passer le fichier sans preciser token dans le nom.
+
+    Il existe bien une methode... le lien symbolique !
+
+    Pour se faire on execute ces commandes
+
+    `ln -s /home/user/level08/token /tmp/lsf`
+
+    `./level08 /tmp/lsf`
+
+    et on récupère le flag.

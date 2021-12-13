@@ -1,0 +1,21 @@
+FLAG 01 :
+
+    J'avais vue lors de la premiere étape en faisant un `cat` sur `/ect/passwd` un truc qui m'a intrigué sur le `flag01`
+    donc on vas retaper la commande et voir ce qu'on vas pouvoir faire ( on ajoute un `| grep 'flag01'` pour épurer le
+    résultat).
+
+    Déjà testons si le `42hDRfypTqqnw` nous donne le flag...
+
+    Apparemment ce n'est pas ce qui nous permet de nous identifier, il semblerais apres recherche qu'il s'agisse d'un
+    mot de passe hashé.
+
+    Si il était bien crypté il devrait être écrit 'x' a la place. En regardant sur les forum il est conseillé d'utiliser
+    `john`.
+
+    Dans la vidéo de l'intra on nous parle d'un logiciel nommé john dont on est censé avoir besoin ça semble coincider.
+
+    On vas donc tester ce logiciel.
+
+    on trouve comme résultat :
+
+    `abcdefg`

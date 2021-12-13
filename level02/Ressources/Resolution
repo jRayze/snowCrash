@@ -1,0 +1,35 @@
+FLAG 02 :
+
+    Arrivé a ce niveau en faisant un `ls` on trouve un fichier `.pcap`.
+
+    Le fichier pcap est fichier qui enregistre les informations des données de packets réseau.
+
+    En faisant des recherches sur internet on nous parle du logiciel `wireshark` qui permet de lire ce genre fichier.
+
+    Pour ce faire on vas récupérer ce fichier depuis le serveur avec la commande :
+
+        `scp -P 4242 level02@172.20.10.10:./level02.pcap  .`
+
+    On télécharge et on installe ensuite wireshark.
+
+    On lance wireshark et on clique sur [analyser] -> [suivre] -> [flux TCP] pour voir ce qu'il se passe sur le réseau.
+
+    On se trouve avec une suite de caractère on peut lire login et password en claire
+
+        ---------------------------------------------
+        |   ..wwwbugs login: l.le.ev.ve.el.lX.X     |
+        |   ..                                      |
+        |                                           |
+        |   Password: ft_wandr...NDRel.L0L          |
+        ---------------------------------------------
+
+    On vas tester le password... ça ne fonctionne pas
+
+    Je vois en cliquant sur chaque caractères que le dernier code hexa correspond à chaque caractère de l'analyse de flux.
+
+    En vérifiant chaque caractère on tombe sur le caractère '.' qui en fait correspond au hexa '7f' qui correspond lui
+    meme au caractère 'DEL' dans la table ascii on vas donc tester le mot de passe en appuyant sur del lorsqu'il y a des
+    points ce qui nous donne :
+
+    ft_waNDReL0L
+
