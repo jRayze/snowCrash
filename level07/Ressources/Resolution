@@ -1,0 +1,15 @@
+FLAG 07 :
+
+    Ici on se retrouve en face d'un binaire qui nous renvoie un de nos id visiblement.
+
+    En regardant de plus prêt avec la commande `strings` on peut voir que le fichier fait un appel system à `/bin/echo`.
+
+    On peut également voir que `LOGNAME` est utilisé.
+
+    Il semblerais donc que le echo se fasse donc sur le `LOGNAME` et nous savons comment demander à echo d'executer
+    une autre commande avec `$(commande)`.
+
+    On vas donc remplacer la variable d'environnement `LOGNAME` par :
+        `LOGNAME='echo $(getflag)'`
+
+    En executant ensuite le binaire nous avons bien notre flag.

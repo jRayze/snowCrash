@@ -56,15 +56,15 @@ FLAG 02 :
     Arrivé a ce niveau en faisant un ls on trouve un fichier .pcap.
     Le fichier pcap est fichier qui enregistre les informations des données de packets réseau.
     En faisant des recherches sur internet on nous parle du logiciel wireshark qui permet de lire ce genrde fichier.
-    Pour ce faire on vas récuperer ce fichier depuis le serveur avec la commande : 
+    Pour ce faire on vas récuperer ce fichier depuis le serveur avec la commande :
         scp -P 4242 level02@172.20.10.10:./level02.pcap  .
-    
+
     On télécharge et on installe ensuite wireshark.
 
     On lance wireshark et on clique sur [analyser] -> [suivre] -> [flux TCP] pour voir ce qu'il se passe sur le reseau.
 
-    On se trouver avec une suite de caractère on peut lire login et password en claire 
-    
+    On se trouver avec une suite de caractère on peut lire login et password en claire
+
         ---------------------------------------------
         |   ..wwwbugs login: l.le.ev.ve.el.lX.X     |
         |   ..                                      |
@@ -74,7 +74,7 @@ FLAG 02 :
 
     on vas tester le password ça ne foncitonne pas
 
-    Je vois en cliquant sur chaques caractères que le dernier code hexa correspond a chaques caractère de l'analyse de flux. 
+    Je vois en cliquant sur chaques caractères que le dernier code hexa correspond a chaques caractère de l'analyse de flux.
     En verifiant chaques caractère on tombe sur le caractère '.' qui en fait correspond au hexa '7f' qui correspond lui meme au caractère 'DEL' dans la table ascii on vas donc tester le mot de passe en appuiant sur del lorsqu'il y a des points ce qui nous donne :
 
     ft_waNDReL0L
@@ -301,15 +301,6 @@ FlAG 08:
     quif5eloekouj29ke0vouxean
 
 FLAG 09:
-
-reverse en pyton
-import string
-
-    with open('/home/user/level09/token') as f:
-        contents = f.read()
-        content = filter(lambda x: x in string.printable, contents)
-        txt = content.rstrip("\n") [::-1]
-        print(txt)
 
 add ascii number 
 

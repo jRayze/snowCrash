@@ -1,0 +1,28 @@
+FLAG 00 :
+
+    Dans un premier temps on regarde les fichiers qu'il y a avec 'ls'.
+
+    Malheureusement on ne voit rien d'affiché.
+
+    Apres plusieurs recherche dans le '/etc/passwd' et autres on decide de chercher une autre solution.
+
+    On regarde dans le man et on trouve la commande 'find' qui peut nous permettre de trouver des fichiers contenant des
+    mots spécifique.
+
+    On vas chercher le 'flag00' depuis la racine avec l'option '-user' vue que c'est ce qui nous intéresse.
+
+   --> find / -user 'flag00'
+
+    on retrouve alors '/usr/sbin/john' et '/rofs/usr/sbin/john' seuls fichier dont on a accès.
+
+    en faisant un 'cat' sur '/usr/sbin/john' on obtient donc
+
+    --> cdiiddwpgswtgt
+
+    apres avoir testé plusieurs décrypteur (md5, sha256, ...) on decide de tester des choses plus basique et en
+    utilisant le décrypteur de code cesar sur 'https://www.dcode.fr/chiffre-cesar' on voit qu'en rot + 15 on trouve
+    une réponse assez satisfaisante :
+
+    --> nottoohardhere
+
+    on la test avec et ça fonctionne et nous donne le mot de pass de flag01

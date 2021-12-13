@@ -1,0 +1,17 @@
+FLAG 09:
+
+    Pour le flag 09 on se retrouve avec 2 fichiers, un fichier token et un binaire qui prend 1 paramètre
+
+    On ne vois pas grand chose à exploiter avec strings ou nm mais en testant plusieurs choses comme paramètre on se rend
+    compte qu'il prend la string en question et incrémente chaque caractère en fonction de sa position dans la string.
+
+    Le programme prend donc en paramètre le fichier token et change ses lettres, on imagine qu'en créant un programme
+    qui fait le contraire on devrait pouvoir peut etre avoir une piste.
+
+    J'ai donc decider de créer un script python dans /tmp :
+
+    ceci fait on execute le script et on renvoie le résultat dans un fichier
+
+         `python /tmp/incr.py > /tmp/res`
+
+    On essaye le résultat pour flag09 et bim ça marche et on a fini la partie obligatoire !

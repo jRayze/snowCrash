@@ -1,0 +1,32 @@
+FLAG 03 :
+
+    Ici on se retrouve avec un executable, lorsqu'on le lance ça nous dit "exploit me".
+
+    Bon deja regardons les droits sur le binaire.
+
+    `ls -la`
+
+    `-rwsr-sr-x 1 flag03  level03 8627 Mar  5  2016 level03`
+
+    On peut voir qu'il s'agit d'un binaire avec des droits sur le groupe (s) level03.
+
+    Nous faisont partie de ce groupe et on peut le vérifier en faisant la commande `id`.
+
+    En faisant un strings sur le projet on voit qu'il y a la commande `echo` qui est appelé sans préciser le path complet.
+
+    On vas pouvoir exploiter cette erreur.
+
+    il s'agit ici de créer un nouveau exec echo qui appelera la fonction `getflag` plutot:
+
+        echo 'getflag' > /tmp/echo`
+
+    on vas ensuite changer le PATH pour ajouter le path du nouvel echo au debut :
+
+        `PATH=/tmp:$PATH`
+
+    bon en fait ça marchais pas directement j'ai oublié de rendre le fichier echo executable donc du coup on fait :
+
+        `chmod 755 /tmp/echo`
+
+    maintenant quand on execute `./level03` ca execute notre écho qui appelle `getflag` et on récupère le flag.
+

@@ -1,0 +1,38 @@
+FLAG 04 :
+
+   Pour le flag04 nous avons un fichier .pl, il s'agit d'un fichier perl.
+
+   En faisan un `cat` sur le fichier on peut voir le fichier.
+
+   Le detail :
+
+	#!/usr/bin/perl
+    # localhost:4747                        //  adresse du serveur, il faudra remplacer localhost par l'ip de la vm pour
+                                            //  y accéder
+    use CGI qw{param};                      //
+    print "Content-type: text/html\n\n";    //  affiche le header pour le fichier html
+    sub x {                                 //  fonction x
+        $y = $_[0];                         //  y vaux le paramètre 0
+        print `echo $y 2>&1`;               //  affiche la commande 'echo' avec le paramètre 0 et redirige la sortie
+                                            //  d'erreur sur la sortie standard
+    }
+    x(param("x"));                          //  appel de la fonction x avec le paramètre "param" qui prends en
+                                            //  paramètre "x"
+
+
+    En allant sur la page en question `[ip vm snowCrash]:4747` on peut voir qu'une page blanche s'affiche.
+
+    On essaye d'accéder a la fonction `x` depuis l'Url en ajoutant `?x=test`.
+
+    Ce qui devrait nous retourner test dans la page au vue du code ci dessus et c'est bien ce qu'il se passe.
+
+    On doit maintenant trouver un moyen de récupérer le flag.
+
+    Apres recherche on découvre que echo est exploitable grace aux commandes de substitutions qui exécutent la commande
+    dans un sous shell.
+
+    pour se faire on utilise `$(nom_de_la_commande)`.
+
+    On vas donc tenter avec `getflag`.
+
+    Le echo lisant le paramètre indique dans l'Url on tape `[ip vm snowCrash]:4747?x=$(getflag)` et on récupère le flag04.
